@@ -4,6 +4,16 @@ const app = express()
 const {bots, playerRecord} = require('./data')
 const {shuffleArray} = require('./utils')
 
+var Rollbar = require("rollbar");
+var rollbar = new Rollbar({
+  accessToken: '88b1e2b8fb8b4a3ca46e5336ecadad3f',
+  captureUncaught: true,
+  captureUnhandledRejections: true
+});
+
+// record a generic message and send it to Rollbar
+rollbar.log("Hello world!");
+
 app.use(express.json())
 
 app.get('/', function(req, res){
@@ -15,6 +25,7 @@ app.use(express.static(path.join(__dirname, './public')))
 
 app.get('/api/robots', (req, res) => {
     try {
+        rollbar.warning("Robots have been sent!")
         res.status(200).send(botsArr)
     } catch (error) {
         console.log('ERROR GETTING BOTS', error)
@@ -24,6 +35,7 @@ app.get('/api/robots', (req, res) => {
 
 app.get('/api/robots/five', (req, res) => {
     try {
+        rollbar.warning("Five Bots are being displayed")
         let shuffled = shuffleArray(bots)
         let choices = shuffled.slice(0, 5)
         let compDuo = shuffled.slice(6, 8)
@@ -36,6 +48,7 @@ app.get('/api/robots/five', (req, res) => {
 
 app.post('/api/duel', (req, res) => {
     try {
+        rollbar.info("user selected player")
         // getting the duos from the front end
         let {compDuo, playerDuo} = req.body
 
@@ -67,6 +80,7 @@ app.post('/api/duel', (req, res) => {
 
 app.get('/api/player', (req, res) => {
     try {
+        rollbar.error("Wrong stats being displayed")
         res.status(200).send(playerRecord)
     } catch (error) {
         console.log('ERROR GETTING PLAYER STATS', error)
